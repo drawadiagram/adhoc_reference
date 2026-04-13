@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ELISA: Procedure & Binding Affinity Estimation</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;font-size:15px;line-height:1.7;color:#1a1a1a;background:#fff;max-width:820px;margin:0 auto;padding:2rem 1.5rem}
+h1{font-size:22px;font-weight:600;margin-bottom:0.3rem}
+h2{font-size:17px;font-weight:600;margin:2rem 0 0.6rem;border-bottom:1px solid #eee;padding-bottom:4px}
+p{margin-bottom:0.8rem}
+.subtitle{color:#666;font-size:13px;margin-bottom:2rem}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:1rem 0 1.5rem}
+.step{background:#f7f8fa;border:0.5px solid #ddd;border-radius:10px;padding:1rem;text-align:center}
+.step-num{display:inline-block;width:24px;height:24px;border-radius:50%;background:#378ADD;color:#fff;font-size:12px;font-weight:600;line-height:24px;margin-bottom:6px}
+.step h3{font-size:13px;font-weight:600;margin:4px 0 4px;color:#1a1a1a}
+.step p{font-size:12px;color:#666;margin:0}
+.fig{width:100%;border-radius:8px;margin:1rem 0;display:block}
+.callout{background:#f0f6ff;border-left:3px solid #378ADD;border-radius:0 8px 8px 0;padding:0.75rem 1rem;font-size:13px;margin:1rem 0}
+.caveat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:0.8rem 0}
+.caveat{background:#fff8f0;border:0.5px solid #e8c97a;border-radius:8px;padding:0.75rem;font-size:13px}
+.caveat strong{display:block;margin-bottom:2px;color:#7a5000}
+footer{margin-top:2.5rem;font-size:12px;color:#aaa;border-top:1px solid #eee;padding-top:1rem}
+</style>
+</head>
+<body>
+
+<h1>ELISA: Procedure & Binding Affinity Estimation</h1>
+<p class="subtitle">Enzyme-Linked Immunosorbent Assay — principles, protocol, and K<sub>D</sub> estimation from titration data</p>
+
+<h2>What is ELISA?</h2>
+<p>ELISA is a plate-based immunoassay that uses enzyme-linked antibodies to detect and quantify proteins, antigens, or antibodies in solution. Signal is generated when an enzyme conjugated to a detection antibody converts a colorimetric substrate, producing absorbance proportional to the amount of bound analyte.</p>
+
+<h2>Step-by-step procedure</h2>
+<div class="steps">
+  <div class="step"><div class="step-num">1</div><h3>Coat</h3><p>Antigen (or capture Ab) adsorbed to 96-well plate overnight. Unbound material washed away.</p></div>
+  <div class="step"><div class="step-num">2</div><h3>Block</h3><p>Free sites saturated with BSA or milk to prevent non-specific binding, then washed.</p></div>
+  <div class="step"><div class="step-num">3</div><h3>Primary binding</h3><p>Analyte added in serial dilution series; incubated to allow binding equilibrium.</p></div>
+  <div class="step"><div class="step-num">4</div><h3>Detection</h3><p>HRP-conjugated secondary Ab added, binds primary analyte; excess washed off.</p></div>
+  <div class="step"><div class="step-num">5</div><h3>Signal readout</h3><p>TMB substrate added → color change → stop reaction → absorbance read at 450 nm.</p></div>
+</div>
+
+<h2>Figure 1 — ELISA well cross-section & dilution series</h2>
+<p>Each column shows a schematic cross-section of a well at one concentration point in the titration series. Well fill intensity and bar height reflect relative absorbance at 450 nm.</p>
+<img id="fig1" class="fig" alt="ELISA well cross-sections showing decreasing signal with decreasing analyte concentration">
+
+<h2>Figure 2 — Sigmoidal binding curve & EC₅₀</h2>
+<p>Absorbance vs. concentration data is fitted to a 4-parameter logistic (4PL) sigmoidal model. The EC₅₀ — concentration at half-maximal signal — approximates the apparent K<sub>D</sub> under dilute conditions.</p>
+<img id="fig2" class="fig" alt="Sigmoidal dose-response curve with EC50 marked at half-maximal absorbance">
+
+<div class="callout">
+  <strong>Reading off K<sub>D</sub>:</strong> the inflection point of the sigmoidal curve (where A₄₅₀ = (A<sub>max</sub> + A<sub>min</sub>) / 2) gives the EC₅₀. When free analyte ≈ total analyte (dilute regime), EC₅₀ ≈ apparent K<sub>D</sub>.
+</div>
+
+<h2>Caveats for affinity estimation</h2>
+<div class="caveat-grid">
+  <div class="caveat"><strong>Surface immobilization</strong>Coating can alter antigen conformation, affecting binding vs. solution conditions.</div>
+  <div class="caveat"><strong>Avidity inflation</strong>Multivalent binding to immobilized antigen artificially lowers apparent K<sub>D</sub> vs. true monovalent affinity.</div>
+  <div class="caveat"><strong>Hook effect</strong>At very high analyte concentrations, signal may decrease — violating the EC₅₀ = K<sub>D</sub> assumption.</div>
+  <div class="caveat"><strong>Best use case</strong>ELISA affinity estimates are best for rank-ordering binders. Precise K<sub>D</sub> requires SPR (Biacore) or BLI.</div>
+</div>
+
+<footer>ELISA — Enzyme-Linked Immunosorbent Assay &nbsp;|&nbsp; 4PL = 4-parameter logistic &nbsp;|&nbsp; HRP = horseradish peroxidase &nbsp;|&nbsp; TMB = 3,3′,5,5′-tetramethylbenzidine</footer>
+
+<script>
+// ── shared helpers ──────────────────────────────────────────────
+function mkCanvas(w,h){var c=document.createElement('canvas');c.width=w;c.height=h;return c;}
+var BLUE='#378ADD', AMBER='#EF9F27', AMBER_D='#BA7517', CORAL='#D85A30', GRAY='#888780', LIGHT='#f7f8fa';
+
+// ── Figure 1: well cross-sections + absorbance bars ─────────────
+(function(){
+  var concs=[100,50,25,12.5,6.25,3.1,1.6];
+  var top=1.85,bot=0.04,ec50=22,h=1.05;
+  function sig(c){return bot+(top-bot)/(1+Math.pow(ec50/c,h));}
+  var abs=concs.map(sig);
+  var maxAbs=abs[0];
+
+  var W=760,PAD=40,cols=concs.length;
+  var colW=Math.floor((W-PAD*2)/cols);
+  var wellR=Math.floor(colW*0.34);
+  var wellCY=PAD+wellR+20; // center y of wells
+  var barMaxH=70;
+  var barTop=wellCY+wellR+12;
+  var barBotY=barTop+barMaxH;
+  var labelY=barBotY+18;
+  var H=labelY+30;
+
+  var cv=mkCanvas(W,H);
+  var cx=cv.getContext('2d');
+  cx.fillStyle='#fff'; cx.fillRect(0,0,W,H);
+
+  // section label
+  cx.fillStyle=GRAY; cx.font='11px system-ui'; cx.textAlign='left';
+  cx.fillText('A₄₅₀ ↓',4,barTop+4);
+
+  concs.forEach(function(c,i){
+    var x=PAD+i*colW+colW/2;
+    var a=abs[i];
+    var op=0.08+0.88*(a/maxAbs);
+
+    // well circle
+    cx.beginPath();
+    cx.arc(x,wellCY,wellR,0,Math.PI*2);
+    cx.fillStyle='rgba(239,159,39,'+op.toFixed(2)+')';
+    cx.fill();
+    cx.lineWidth=1; cx.strokeStyle='#ccc'; cx.stroke();
+
+    // well rim label: layer stack inside well (antigen triangles)
+    // draw small triangle (antigen) at bottom of well
+    var bY=wellCY+wellR-8;
+    cx.fillStyle='rgba(55,138,221,0.7)';
+    [-10,0,10].forEach(function(dx){
+      cx.beginPath();cx.moveTo(x+dx,bY);cx.lineTo(x+dx-5,bY+8);cx.lineTo(x+dx+5,bY+8);cx.closePath();cx.fill();
+    });
+
+    // absorbance bar
+    var bH=Math.max(3,Math.round(barMaxH*(a/maxAbs)));
+    cx.fillStyle=AMBER_D;
+    cx.globalAlpha=0.5+0.5*(a/maxAbs);
+    cx.fillRect(x-colW*0.18,barBotY-bH,colW*0.36,bH);
+    cx.globalAlpha=1;
+
+    // concentration label
+    cx.fillStyle='#444'; cx.font='11px system-ui'; cx.textAlign='center';
+    cx.fillText(c+' nM',x,labelY);
+  });
+
+  // axis label
+  cx.fillStyle=GRAY; cx.font='11px system-ui'; cx.textAlign='center';
+  cx.fillText('← decreasing [analyte]',W/2,H-4);
+
+  // legend
+  cx.fillStyle='rgba(55,138,221,0.7)';
+  cx.beginPath();cx.moveTo(PAD,12);cx.lineTo(PAD-5,20);cx.lineTo(PAD+5,20);cx.closePath();cx.fill();
+  cx.fillStyle=GRAY; cx.font='11px system-ui'; cx.textAlign='left';
+  cx.fillText('= antigen',PAD+8,20);
+  cx.fillStyle=AMBER_D; cx.fillRect(PAD+80,12,12,8);
+  cx.fillText('= absorbance bar',PAD+96,20);
+
+  document.getElementById('fig1').src=cv.toDataURL('image/png');
+})();
+
+// ── Figure 2: sigmoidal binding curve ───────────────────────────
+(function(){
+  var W=760,H=340;
+  var L=64,R=W-30,T=20,B=H-50;
+  var plotW=R-L, plotH=B-T;
+
+  var concs=[0.2,0.4,0.8,1.6,3.1,6.25,12.5,25,50,100,200];
+  var top=1.85,bot=0.04,ec50=22,h=1.05;
+  function sig(c){return bot+(top-bot)/(1+Math.pow(ec50/c,h));}
+  var abs=concs.map(sig);
+  var halfMax=(top+bot)/2;
+
+  var logMin=Math.log10(concs[0]),logMax=Math.log10(concs[concs.length-1]);
+  function xpx(c){return L+((Math.log10(c)-logMin)/(logMax-logMin))*plotW;}
+  function ypx(a){return B-((a-0)/(2.1-0))*plotH;}
+
+  var cv=mkCanvas(W,H);
+  var cx=cv.getContext('2d');
+  cx.fillStyle='#fff'; cx.fillRect(0,0,W,H);
+
+  // grid lines
+  cx.strokeStyle='#eee'; cx.lineWidth=1;
+  [0,0.5,1.0,1.5,2.0].forEach(function(a){
+    var y=ypx(a); cx.beginPath();cx.moveTo(L,y);cx.lineTo(R,y);cx.stroke();
+  });
+
+  // half-max dashed line
+  cx.setLineDash([6,4]); cx.strokeStyle=CORAL; cx.lineWidth=1.5;
+  cx.beginPath();cx.moveTo(L,ypx(halfMax));cx.lineTo(R,ypx(halfMax));cx.stroke();
+  cx.setLineDash([]);
+
+  // EC50 vertical dashed line
+  cx.setLineDash([4,3]); cx.strokeStyle='#aaa'; cx.lineWidth=1;
+  cx.beginPath();cx.moveTo(xpx(ec50),T);cx.lineTo(xpx(ec50),B);cx.stroke();
+  cx.setLineDash([]);
+
+  // filled area under curve
+  cx.beginPath();
+  cx.moveTo(xpx(concs[0]),ypx(0));
+  concs.forEach(function(c){cx.lineTo(xpx(c),ypx(sig(c)));});
+  cx.lineTo(xpx(concs[concs.length-1]),ypx(0));
+  cx.closePath();
+  cx.fillStyle='rgba(55,138,221,0.08)'; cx.fill();
+
+  // curve
+  cx.beginPath();
+  for(var i=0;i<=200;i++){
+    var lc=logMin+(logMax-logMin)*(i/200);
+    var c=Math.pow(10,lc);
+    var y=ypx(sig(c));
+    i===0?cx.moveTo(xpx(c),y):cx.lineTo(xpx(c),y);
+  }
+  cx.strokeStyle=BLUE; cx.lineWidth=2.5; cx.stroke();
+
+  // data points
+  cx.fillStyle=BLUE;
+  concs.forEach(function(c){
+    cx.beginPath();cx.arc(xpx(c),ypx(sig(c)),4.5,0,Math.PI*2);cx.fill();
+    cx.strokeStyle='#fff';cx.lineWidth=1.5;cx.stroke();
+  });
+
+  // EC50 annotation
+  cx.fillStyle=CORAL; cx.font='bold 12px system-ui'; cx.textAlign='center';
+  cx.fillText('EC₅₀ ≈ K_D ≈ '+ec50+' nM',xpx(ec50),T+14);
+
+  // half-max annotation
+  cx.fillStyle=CORAL; cx.font='11px system-ui'; cx.textAlign='left';
+  cx.fillText('½ max = '+halfMax.toFixed(2),R-100,ypx(halfMax)-6);
+
+  // axes
+  cx.strokeStyle='#ccc'; cx.lineWidth=1;
+  cx.beginPath();cx.moveTo(L,T);cx.lineTo(L,B);cx.lineTo(R,B);cx.stroke();
+
+  // y-axis labels
+  cx.fillStyle='#555'; cx.font='11px system-ui'; cx.textAlign='right';
+  [0,0.5,1.0,1.5,2.0].forEach(function(a){
+    cx.fillText(a.toFixed(1),L-6,ypx(a)+4);
+  });
+
+  // x-axis labels
+  cx.textAlign='center';
+  concs.forEach(function(c){
+    cx.fillText(c+'',xpx(c),B+16);
+  });
+
+  // axis titles
+  cx.fillStyle=GRAY; cx.font='12px system-ui'; cx.textAlign='center';
+  cx.fillText('Analyte concentration (nM, log scale)',L+plotW/2,H-6);
+
+  cx.save();cx.translate(14,T+plotH/2);cx.rotate(-Math.PI/2);
+  cx.fillText('Absorbance (A₄₅₀)',0,0);cx.restore();
+
+  // legend
+  var lx=L+20,ly=T+10;
+  cx.strokeStyle=BLUE;cx.lineWidth=2.5;
+  cx.beginPath();cx.moveTo(lx,ly);cx.lineTo(lx+28,ly);cx.stroke();
+  cx.fillStyle=BLUE;cx.beginPath();cx.arc(lx+14,ly,4,0,Math.PI*2);cx.fill();
+  cx.fillStyle='#444';cx.font='11px system-ui';cx.textAlign='left';
+  cx.fillText('Absorbance (4PL fit)',lx+34,ly+4);
+
+  cx.setLineDash([5,4]);cx.strokeStyle=CORAL;cx.lineWidth=1.5;
+  cx.beginPath();cx.moveTo(lx,ly+18);cx.lineTo(lx+28,ly+18);cx.stroke();
+  cx.setLineDash([]);
+  cx.fillStyle='#444';
+  cx.fillText('Half-maximal signal → EC₅₀',lx+34,ly+22);
+
+  document.getElementById('fig2').src=cv.toDataURL('image/png');
+})();
+</script>
+</body>
+</html>
